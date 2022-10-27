@@ -31,6 +31,7 @@
                 }
             } else if (barCode.startsWith("1018")) {
                 console.log(`Barcode: ${barCode}`);
+                await delay(2000);
                 window.location.replace(`https://www.canadapost-postescanada.ca/track-reperage/en#/details/${barCode}`);
             }
         };
