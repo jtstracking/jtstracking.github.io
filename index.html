@@ -14,33 +14,7 @@
     <h1>JT's Outdoor Fabrics</h1>
     <p>Redirecting...</p>
 
-    <script>
-        const delay = ms => new Promise(res => setTimeout(res, ms));
-
-        const redirect = async barCode => {
-            // if the barcode starts with the Canpar "D", perform Canpar stuff...
-            if (barCode.toUpperCase().startsWith("D")) {
-                if (barCode.includes(",")) {
-                    const array = barCode.split(",");
-                    const address = array.join("%2C+");
-                    await delay(2000);
-                    window.location.replace(`https://canpar.ca/en/tracking/track.htm?barcode=${address}`);
-                } else {
-                    await delay(2000);
-                    window.location.replace(`https://canpar.ca/en/tracking/track.htm?barcode=${barCode}`);
-                }
-            } else if (barCode.startsWith("1018")) {
-                console.log(`Barcode: ${barCode}`);
-                await delay(2000);
-                window.location.replace(`https://www.canadapost-postescanada.ca/track-reperage/en#/details/${barCode}`);
-            }
-        };
-
-        const querySearch = window.location.search;
-        const urlParams = new URLSearchParams(querySearch);
-        const barCode = urlParams.get("barcode");
-        redirect(barCode);
-    </script>
+    <script src="./script.js"></script>
 </body>
 
 </html>
