@@ -1,5 +1,5 @@
 const detect = (trackingNumber) => {
-    if (trackingNumber.toUpperCase().startsWith("D")) {
+    if (trackingNumber.toUppercase().startsWith("D")) {
         return Courier.canpar;
     }
 
