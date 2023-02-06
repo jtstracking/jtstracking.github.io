@@ -4,57 +4,59 @@
 const CANPAR_LINK = "https://canpar.ca/en/tracking/track.htm?barcode=";
 const CANADAPOST_LINK = "https://www.canadapost-postescanada.ca/track-reperage/en#/details/";
 
-/**
- * HTML content
- */
-const invalidTrackingDetails = document.getElementById("invalid-tracking-details");
+class TrackingNumber {
+    constructor(trackingNumber) {
+        this.trackingNumber = trackingNumber.toUpperCase();
+        if (this.trackingNumber.startsWith("D")) {
+            this.trackingLink = `${CANPAR_LINK}${this.trackingNumber}`;
+        } else {
+            this.trackingLink = `${CANADAPOST_LINK}${this.trackingNumber}`;
+        }
+    }
+
+    append() {
+        const trackingDetailsList = document.getElementById("tracking-details-list");
+        const trackingDetailsCard = 
+            `<div class="tracking-details-card d-flex justify-content-between align-items-center">
+            <h5>{trackingNumber}</h5>
+            <a href="{link}">
+            <button type="button" class="btn btn-primary">Track this parcel.</button>
+            </a>
+            </div>`;
+        
+        trackingDetailsList.innerHTML += trackingDetailsCard
+            .replace("{trackingNumber}", this.trackingNumber)
+            .replace("{link}", this.trackingLink);
+    }
+};
 
 const trackingDetails = document.getElementById("tracking-details");
 const trackingDetailsId = document.getElementById("tracking-details-id");
 const trackingDetailsCount = document.getElementById("tracking-details-count");
-const trackingDetailsList = document.getElementById("tracking-details-list");
-const trackingDetailsCard = `
-    <div class="tracking-details-card d-flex justify-content-between align-items-center">
-        <h5>{trackingNumber}</h5>
-        <a href="{link}">
-            <button type="button" class="btn btn-primary">Track this parcel.</button>
-        </a>
-    </div>
-`
+const invalidTrackingDetails = document.getElementById("invalid-tracking-details");
 
-const redirect = document.getElementById("redirecting");
-
-const quickRedirect = (trackingNumber) => {
+const findTrackingNumbers = (trackingNumber) => {
+    const trackingNumbers = [];
     if (trackingNumber.toUpperCase().startsWith("D")) {
         if (trackingNumber.includes("-")) {
             const array = trackingNumber.split("-");
             const prefix = array[0].slice(0, array[0].length - 4);
-            const newTracking = [array[0]];
+            trackingNumbers.push(new TrackingNumber(array[0]));
             for (var i = 1; i < array.length; i++)
-                newTracking[i] = `${prefix}${array[i]}`;
-
-            const newUrl = newTracking.join("%2C+");
-            console.log(newTracking.join("%2C+"));
-            window.location.replace(`${CANPAR_LINK}${newUrl}`);
-
-            return;
+                trackingNumbers.push(new TrackingNumber(`${prefix}${array[i]}`));
+        } else {
+            trackingNumbers.push(new TrackingNumber(trackingNumber));
         }
-
-        window.location.replace(`${CANPAR_LINK}${trackingNumber}`);
-
-        return;
+    } else {
+        if (trackingNumber.includes("-"))
+            trackingNumber.split("-").forEach(x => trackingNumbers.push(new TrackingNumber(x)));
+        
+        else
+            trackingNumbers.push(new TrackingNumber(trackingNumber));
     }
 
-    // now, it would safe to assume it is canada post.
-    if (trackingNumber.includes("-")) {
-        const array = trackingNumber.split("-");
-        window.location.replace(`https://www.canadapost-postescanada.ca/track-reperage/en#/filterPackage?searchFor=${array.join(",")}`); window.close();
-
-        return;
-    }
-
-    window.location.replace(`${CANADAPOST_LINK}${trackingNumber}`);
-}
+    return trackingNumbers;
+};
 
 const main = () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -62,9 +64,17 @@ const main = () => {
     switch (urlParamsLength) {
         case 1:
             if (urlParams.has("trackingNumber")) {
+                const quick = document.getElementById("quick");
+                const quickCount = document.getElementById("quick-count");
+                const quickList = document.getElementById("quick-list");
+                quick.style.display = "inline";
+
                 const trackingNumber = urlParams.get("trackingNumber");
-                redirect.style.display = "inline";
-                quickRedirect(trackingNumber);
+                const trackingNumbers = findTrackingNumbers(trackingNumber);
+                quickCount.innerHTML = quickCount.innerHTML.replace("{count}", trackingNumbers.length);
+                trackingNumbers.forEach(x => 
+                    quickList.innerHTML += `<li><a href="${x.trackingLink}">${x.trackingNumber}</a></li>`
+                );
 
                 break;
             }
@@ -77,27 +87,17 @@ const main = () => {
         case 2:
             if (urlParams.has("trackingNumber") && urlParams.has("orderNumber")) {
                 const trackingNumber = urlParams.get("trackingNumber");
-                const orderNumber = urlParams.get("orderNumber");
+                const orderNumber = urlParams.get("orderNumber").toUpperCase();
                 trackingDetails.style.display = "inline";
                 trackingDetailsId.innerHTML = trackingDetailsId.innerHTML.replace("{order_number}", orderNumber);
 
-                const array = trackingNumber.split("-");
-                const prefix = array[0].slice(0, array[0].length - 4);
-                const newTracking = [array[0]];
-                for (var i = 1; i < array.length; i++)
-                    newTracking[i] = `${prefix}${array[i]}`;
-                trackingDetailsCount.innerHTML = trackingDetailsCount.innerHTML.replace("{count}", newTracking.length);
-
-                newTracking.forEach(number => {
-                    trackingDetailsList.innerHTML += trackingDetailsCard
-                        .replace("{trackingNumber}", number)
-                        .replace("{link}", CANPAR_LINK + number);
-                });
+                const trackingNumbers = findTrackingNumbers(trackingNumber);
+                trackingDetailsCount.innerHTML = trackingDetailsCount.innerHTML.replace("{count}", trackingNumbers.length);
+                trackingNumbers.forEach(x => x.append());
 
                 break;
             }
 
-            // invalid.
             invalidTrackingDetails.style.display = "inline";
             console.log("Invalid tracking details...");
 

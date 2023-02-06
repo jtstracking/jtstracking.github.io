@@ -28,8 +28,10 @@
                     with your order number.</p>
             </div>
 
-            <div id="redirecting" style="display: none;">
-                <h3>You will now be redirected to your tracking information...</h3>
+            <div id="quick" style="display: none;">
+                <h3 id="quick-count">Your order has {count} parcel(s).</h3>
+                <p class="lead"><em>Please note that if your order has multiple parcels, they may arrive on different dates.</em></p>
+                <ul id="quick-list"></ul>
             </div>
 
             <div id="tracking-details" style="display: none;">
@@ -52,7 +54,7 @@
         }
 
         #tracking-details-list > .tracking-details-card {
-            padding: 10px;
+            padding: 20px;
             box-shadow: 0px 0px 5px gray;
             border-radius: 10px;
             margin-bottom: 10px;
