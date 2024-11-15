@@ -7,7 +7,7 @@ const CANADAPOST_LINK = "https://www.canadapost-postescanada.ca/track-reperage/e
 class TrackingNumber {
   constructor(trackingNumber) {
     this.trackingNumber = trackingNumber.toUpperCase();
-    if (this.trackingNumber.startsWith("D43400079") || this.trackingNumber.startsWith("U43400079") {
+    if (this.trackingNumber.startsWith("D43400079") || this.trackingNumber.startsWith("U43400079")) {
       this.trackingLink = `${CANPAR_LINK}${this.trackingNumber}`;
     } else {
       this.trackingLink = `${CANADAPOST_LINK}${this.trackingNumber}`;
