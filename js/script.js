@@ -2,6 +2,7 @@
  * Links for tracking information.
  */
 const CANPAR_LINK = "https://canpar.ca/en/tracking/track.htm?barcode=";
+const UPS_LINK = "https://www.ups.com/track?track=yes&trackNums={barcode}&loc=en_US&requester=ST/trackdetails";
 const CANADAPOST_LINK = "https://www.canadapost-postescanada.ca/track-reperage/en#/details/";
 
 class TrackingNumber {
@@ -9,6 +10,8 @@ class TrackingNumber {
     this.trackingNumber = trackingNumber.toUpperCase();
     if (this.trackingNumber.startsWith("D43400079") || this.trackingNumber.startsWith("U43400079")) {
       this.trackingLink = `${CANPAR_LINK}${this.trackingNumber}`;
+    } else if (this.trackingNumber.startsWith("1Z")) {
+      this.trackingLink = UPS_LINK.replace("{barcode}", this.trackingNumber);
     } else {
       this.trackingLink = `${CANADAPOST_LINK}${this.trackingNumber}`;
     }
